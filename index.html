@@ -66,15 +66,6 @@
 
         setLoading(true);
 
-        // 公開時は削除: テスト用バイパス
-        if (uid === "9999") {
-          sessionStorage.setItem("authenticated", "true");
-          sessionStorage.setItem("uid", uid);
-          sessionStorage.setItem("name", "テストユーザー");
-          goNext("problems.html");
-          return;
-        }
-
         try {
           const r = await fetch(API + "?route=verify", {
             method: "POST",
