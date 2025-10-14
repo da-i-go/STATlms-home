@@ -32,37 +32,29 @@ body {
 .title {
   margin: 0 0 20px;
   font-size: clamp(20px, 3.2vw, 28px);
-  font-weight: 800;
+  font-weight: 1000;
 }
 
-/* 2列グリッド（極小だけ1列フォールバック） */
+/* 2列グリッド（常時2列／極小でも2列を維持） */
 .grid {
   margin: 0 auto;
   display: grid;
   gap: 16px;
   grid-template-columns: repeat(2, minmax(220px, 1fr));
   max-width: 720px;
+  align-items: stretch; /* 行内で高さをそろえる */
 }
 @media (max-width: 380px) {
-  .grid {
-    grid-template-columns: repeat(2, minmax(140px, 1fr)); /* ← 2列に変更 */
-    gap: 12px; /* 隙間を少し狭く */
-  }
-  .card {
-    padding: 10px;
-    gap: 8px;
-  }
-  .card h3 { font-size: 13px; }
-  .btn { padding: 8px 12px; font-size: 0.85rem; }
+  .grid { grid-template-columns: repeat(2, minmax(140px, 1fr)); } /* ← 2列を維持 */
 }
 
 /* カード：横長(3:2)・中央配置・軽い影 */
 .card {
-  aspect-ratio: 3 / 2; /* 3:2の長方形” */
+  aspect-ratio: 3 / 2;               /* 等高を aspect-ratio で統一 */
   display: flex;
   flex-direction: column;
-  justify-content: center; /* 垂直中央 */
-  align-items: center;      /* 水平中央 */
+  justify-content: flex-start;       /* 中身は上から */
+  align-items: center;
   gap: 14px;
   padding: 14px;
   background: var(--card-bg);
@@ -85,9 +77,11 @@ body {
   text-align: center;
 }
 .card h3 { font-size: clamp(14px, 2.4vw, 18px); }
-.card p  { font-size: 14px; color: var(--text-muted); }
+/* desc の有無で高さがブレないように少しだけ高さを確保 */
+.card h3 { min-height: 1.6em; }
+.card p  { font-size: 14px; color: var(--text-muted); min-height: 2.4em; }
 
-/* 「開始する」ボタン（中央・index寄りの色味） */
+/* 「開始する」ボタン（下寄せ固定・index寄りの色味） */
 .btn {
   display: inline-block;
   padding: 10px 16px;
@@ -99,6 +93,7 @@ body {
   letter-spacing: .02em;
   transition: filter .15s ease, transform .02s ease, box-shadow .15s ease;
   box-shadow: 0 6px 14px var(--primary-shadow);
+  margin-top: auto; /* ← これでボタンが最下部に張り付く */
 }
 .btn:hover  { filter: brightness(.96); }
 .btn:active { transform: scale(.98); }
@@ -147,4 +142,3 @@ body {
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; animation: none !important; }
 }
-
