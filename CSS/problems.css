@@ -228,3 +228,45 @@ body {
     font-size: .95rem;
   }
 }
+
+/* ==== 全体の縦詰め・スマホ向けレイアウト微調整 ==== */
+@media (max-width: 480px) {
+  /* カードの高さと間隔を詰める */
+  .grid {
+    gap: 10px;                        /* ← カード間の縦横間隔を詰める */
+    grid-template-columns: repeat(2, 1fr);
+    grid-auto-rows: auto;             /* 内容に応じて自動伸縮 */
+  }
+
+  .card {
+    min-height: 180px;                /* ← 少し低めに調整（必要に応じて170〜190） */
+    padding: 10px 10px 16px;          /* ← 内側の余白も少し詰める */
+    margin: 0;                        /* ← ブラウザが付ける余白をリセット */
+  }
+
+  .card h3 {
+    font-size: 13px;
+    line-height: 1.25;
+    margin-bottom: 2px;
+  }
+
+  .card p {
+    font-size: 12px;
+    line-height: 1.3;
+    min-height: 1.6em;
+  }
+
+  .btn {
+    padding: 8px 12px;
+    font-size: .9rem;
+    margin-top: auto;
+    margin-bottom: 6px;               /* ← 下端との間を確保しつつ全体は詰める */
+  }
+
+  /* タイトル「問題一覧」の上余白を少し詰める */
+  .container {
+    margin-top: 3vh;                  /* ← 上の空きを少し狭める */
+    margin-bottom: 6vh;               /* ← 下の余白も軽減 */
+  }
+}
+
