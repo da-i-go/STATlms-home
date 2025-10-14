@@ -187,3 +187,37 @@ body {
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; animation: none !important; }
 }
+
+/* ==== モバイルの高さ調整＆等高化（上書き） ==== */
+@media (max-width: 420px) {
+  /* 2列は維持しつつ、各行の最低高さを統一 */
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+    grid-auto-rows: minmax(180px, auto); /* ← 行の“最低高さ”を180pxに */
+  }
+
+  .card {
+    aspect-ratio: auto;        /* ← 固定比率をやめて内容に合わせて伸びる */
+    min-height: 180px;         /* ← 下限を確保（端末により 170〜200 で調整可） */
+    padding: 12px 12px 14px;   /* ← 余白少し詰める */
+    overflow: visible;         /* ← はみ出しを隠さない（ボタン欠け防止） */
+  }
+
+  /* タイトル＆説明の詰まりを軽減 */
+  .card h3 { font-size: 13px; line-height: 1.25; }
+  .card p  { font-size: 12px; line-height: 1.4; min-height: 1.8em; }
+
+  /* ボタンは下に寄せ、サイズは控えめに */
+  .btn {
+    margin-top: auto;          /* ← 下寄せ（既に指定済みでもOK） */
+    padding: 9px 12px;
+    font-size: .9rem;
+  }
+}
+
+/* さらに狭い端末向け（任意） */
+@media (max-width: 360px) {
+  .grid { grid-auto-rows: minmax(190px, auto); }
+  .card { min-height: 190px; }
+}
