@@ -1,0 +1,141 @@
+/* テーマ色（indexに合わせた青） */
+:root {
+  --bg: #f7f9fc;
+  --card-bg: #ffffff;
+  --card-border: #e5e7eb;
+  --text-muted: #5b6776;
+  --primary: #1976d2;
+  --primary-shadow: rgba(25,118,210,.18);
+  --success: #22c55e;
+}
+
+/* 背景*/
+body {
+  margin: 0;
+  background: var(--bg);
+  color: #111;
+  font-family: system-ui, -apple-system, "Helvetica Neue", Arial, "Segoe UI", Roboto, "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
+}
+
+/* コンテナ中央寄せ＋フェードイン */
+.container {
+  max-width: 920px;
+  margin: 6vh auto 10vh;
+  padding: 0 16px;
+  text-align: center;
+  opacity: 0;
+  transition: opacity .25s ease;
+}
+.container.ready { opacity: 1; }
+
+/* タイトル中央 */
+.title {
+  margin: 0 0 20px;
+  font-size: clamp(20px, 3.2vw, 28px);
+  font-weight: 800;
+}
+
+/* 2列グリッド（極小だけ1列フォールバック） */
+.grid {
+  margin: 0 auto;
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(2, minmax(220px, 1fr));
+  max-width: 720px;
+}
+@media (max-width: 380px) {
+  .grid { grid-template-columns: 1fr; }
+}
+
+/* カード：横長(3:2)・中央配置・軽い影 */
+.card {
+  aspect-ratio: 3 / 2; /* 3:2の長方形” */
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* 垂直中央 */
+  align-items: center;      /* 水平中央 */
+  gap: 14px;
+  padding: 14px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 14px;
+  box-shadow: 0 6px 18px rgba(0,0,0,.06);
+  position: relative;
+  transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+}
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(0,0,0,.08);
+  border-color: #dbe2ea;
+}
+
+/* 見出し・補足（中央） */
+.card h3,
+.card p {
+  margin: 0;
+  text-align: center;
+}
+.card h3 { font-size: clamp(14px, 2.4vw, 18px); }
+.card p  { font-size: 14px; color: var(--text-muted); }
+
+/* 「開始する」ボタン（中央・index寄りの色味） */
+.btn {
+  display: inline-block;
+  padding: 10px 16px;
+  border-radius: 10px;
+  background: var(--primary);
+  color: #fff;
+  text-decoration: none;
+  font-weight: 700;
+  letter-spacing: .02em;
+  transition: filter .15s ease, transform .02s ease, box-shadow .15s ease;
+  box-shadow: 0 6px 14px var(--primary-shadow);
+}
+.btn:hover  { filter: brightness(.96); }
+.btn:active { transform: scale(.98); }
+
+/* キーボード操作の見やすいフォーカス */
+.btn:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--primary) 35%, transparent);
+  outline-offset: 2px;
+}
+
+/* 済バッジ（右上） */
+.badge {
+  position: absolute;
+  top: 10px; right: 10px;
+  background: var(--success); color: #fff;
+  border-radius: 999px;
+  padding: 4px 8px;
+  font-weight: 700; font-size: 12px;
+}
+
+/* ログアウトの余白（任意：HTMLで .footer-actions を付けると効く） */
+.footer-actions { margin-top: 24px; }
+
+/* --- 読み込みオーバーレイ（index と統一感） --- */
+.loading[hidden] { display: none; }
+.loading {
+  position: fixed; inset: 0;
+  background: rgba(255,255,255,.85);
+  display: grid; place-items: center;
+  z-index: 9999;
+}
+.spinner {
+  width: 44px; height: 44px; border-radius: 50%;
+  border: 3px solid var(--primary);
+  border-right-color: transparent;
+  animation: spin .8s linear infinite;
+}
+.loading-text {
+  margin-top: 12px;
+  color: #111;
+  font-weight: 600;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* アニメやトランジションが苦手な人向け配慮 */
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}
+

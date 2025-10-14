@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta name="robots" content="noindex, nofollow" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>問題一覧</title>
+
+    <link rel="stylesheet" href="css/problems.css" />
+
+    <script>
+      if (sessionStorage.getItem("authenticated") !== "true") {
+        location.replace("index.html");
+      }
+    </script>
+  </head>
+
+  <body>
+    <main class="container">
+      <h1 class="title">問題一覧</h1>
+
+      <div class="grid" id="problems"></div>
+
+      <div style="text-align: center; margin-top: 16px;">
+        <a href="index.html" class="btn" onclick="sessionStorage.clear()">ログアウト</a>
+      </div>
+    </main>
+    
+    <!-- 読み込み中オーバーレイ -->
+    <div id="loading" class="loading" aria-live="polite" aria-busy="true">
+        <div class="spinner" aria-hidden="true"></div>
+        <p class="loading-text">読み込み中です…</p>
+    </div>
+
+   <script>
+  const API = "https://script.google.com/macros/s/AKfycbx8b_17MyBUxJtJhJ21KFSfJguUBSGKHBg-WjLHHylbqho1pFjZKIMjvqlMWzUWNFcC/exec";
+  const uid = sessionStorage.getItem("uid");
+
+  const root = document.getElementById("problems");
+  const container = document.querySelector("main.container");
+  const loader = document.getElementById("loading");
+
+  const list = [
+    { id: "3-1", title: "症例 3-1", href: "viewer.html?pid=3-1" },
+    { id: "3-2", title: "症例 3-2", href: "viewer.html?pid=3-2" },
+    { id: "3-3", title: "症例 3-3", href: "viewer.html?pid=3-3" },
+    { id: "3-4", title: "症例 3-4", href: "https://da-i-go.github.io/STATlms-3-4-catheter/" }
+  ];
+
+  (async () => {
+    loader.hidden = false;             // ← まずローディング表示
+    const start = performance.now();   // ← 最低表示時間を確保したい時用
+
+    let done = {};
+    try {
+      const r = await fetch(API + "?route=status", {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({ uid })
+      });
+      const j = await r.json();
+      if (j.ok) done = j.done || {};
+    } catch (e) {
+      console.warn(e);
+    }
+
+    // カード描画（既存どおり）
+    list.forEach((p) => {
+      const card = document.createElement("div");
+      card.className = "card";
+      if (done[p.id]) {
+        const b = document.createElement("div");
+        b.className = "badge";
+        b.textContent = "済";
+        card.appendChild(b);
+      }
+      card.innerHTML += `
+        <h3>${p.title}</h3>
+        <p>${p.desc || ""}</p>
+        <a class="btn" href="${p.href}">開始する</a>
+      `;
+      root.appendChild(card);
+    });
+
+    // 最低 300ms はローディングを見せてからフェードイン（好みで数値調整）
+    const elapsed = performance.now() - start;
+    const remain = Math.max(0, 300 - elapsed);
+    setTimeout(() => {
+      loader.hidden = true;
+      container.classList.add("ready");  // ← フェードイン
+    }, remain);
+  })();
+</script>
+
+  </body>
+</html>

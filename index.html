@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta name="robots" content="noindex, nofollow" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>STAT画像学習システム</title>
+    <link rel="stylesheet" href="css/index.css" />
+  </head>
+
+  <body>
+    <main class="container">
+      <section class="card">
+        <h1 class="title">ログイン</h1>
+        <p class="subtitle">職員IDを入力してください。</p>
+
+        <form id="loginForm" class="form">
+          <input
+            name="uid"
+            placeholder="例: AK1234"
+            required
+            class="input"
+            autocomplete="off"
+            autocapitalize="off"
+            autocorrect="off"
+            inputmode="latin"
+          />
+          <button type="submit" class="btn btn-primary">入室する</button>
+        </form>
+      </section>
+    </main>
+
+    <!-- 認証中オーバーレイ -->
+    <div id="loading" class="loading" aria-live="polite" aria-busy="true" hidden>
+      <div class="spinner" aria-hidden="true"></div>
+      <p class="loading-text">認証中です…</p>
+    </div>
+
+    <script>
+      const API =
+        "https://script.google.com/macros/s/AKfycbx8b_17MyBUxJtJhJ21KFSfJguUBSGKHBg-WjLHHylbqho1pFjZKIMjvqlMWzUWNFcC/exec";
+
+      const form = document.getElementById("loginForm");
+      const input = form.querySelector('input[name="uid"]');
+      const button = form.querySelector('button[type="submit"]');
+      const loader = document.getElementById("loading");
+
+      // フェードアウトしてページ遷移
+      function goNext(url) {
+        document.body.classList.add("fade-out");
+        setTimeout(() => location.replace(url), 250);
+      }
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        let uid = new FormData(form).get("uid") || "";
+        uid = uid
+          .replace(/[Ａ-Ｚａ-ｚ０-９]/g, (s) =>
+            String.fromCharCode(s.charCodeAt(0) - 0xfee0)
+          )
+          .replace(/\s+/g, "")
+          .trim();
+
+        if (!uid) return alert("IDを入力してください");
+
+        setLoading(true);
+
+        // 公開時は削除: テスト用バイパス
+        if (uid === "9999") {
+          sessionStorage.setItem("authenticated", "true");
+          sessionStorage.setItem("uid", uid);
+          sessionStorage.setItem("name", "テストユーザー");
+          goNext("problems.html");
+          return;
+        }
+
+        try {
+          const r = await fetch(API + "?route=verify", {
+            method: "POST",
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify({ uid }),
+          });
+
+          if (!r.ok) throw new Error("HTTP " + r.status);
+          const j = await r.json();
+
+          if (j.ok) {
+            sessionStorage.setItem("authenticated", "true");
+            sessionStorage.setItem("uid", uid);
+            sessionStorage.setItem("name", j.name);
+            goNext("problems.html");
+          } else {
+            alert(j.error || "IDが無効です");
+            input.focus();
+          }
+        } catch (err) {
+          console.error(err);
+          alert("通信エラー。時間をおいて再試行してください。");
+          input.focus();
+        } finally {
+          setLoading(false);
+        }
+      });
+
+      function setLoading(isLoading) {
+        if (!loader) return;
+        loader.hidden = !isLoading;
+        button.disabled = isLoading;
+        button.dataset.originalText ??= button.textContent;
+        button.textContent = isLoading ? "認証中…" : button.dataset.originalText;
+        input.readOnly = isLoading;
+      }
+    </script>
+  </body>
+</html>

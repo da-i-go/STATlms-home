@@ -1,0 +1,121 @@
+/* ===== リセット/共通 ===== */
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+  margin: 0;
+  font-family: "Helvetica Neue", system-ui, -apple-system, Arial, sans-serif;
+  background: #f7f9fc;
+}
+
+/* ===== レイアウト（常にど真ん中） ===== */
+.container {
+  min-height: 100svh;          /* モバイルUIを考慮した実画面高 */
+  display: grid;
+  place-items: center;         /* 縦横中央 */
+  padding-inline: 16px;        /* スマホ左右余白 */
+  padding-block: 6vh;
+}
+
+/* ===== カード ===== */
+.card {
+  width: 100%;
+  max-width: 440px;            /* PCでの適正幅 */
+  background: #fff;
+  border-radius: 14px;
+  padding: 2rem;
+  box-shadow: 0 10px 32px rgba(0, 0, 0, .06);
+  text-align: center;
+}
+
+.title { font-size: 1.65rem; margin: 0 0 .6rem; }
+.subtitle { color: #555; margin: 0 0 1.25rem; }
+
+/* ===== フォーム（等幅＆中央揃え） ===== */
+.form {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* 入力＆ボタンの中心線を合わせる */
+  width: 100%;
+}
+
+.input {
+  width: 100%;
+  max-width: 360px;
+  margin-bottom: 1rem;
+  padding: .85rem 1rem;
+  font-size: 1rem;
+  color: #111;
+  background: #fff;
+  border: 1px solid #d7dbe3;
+  border-radius: 8px;
+  outline: none;
+  transition: border-color .2s;
+  text-align: center; /* ★ 入力文字を中央寄せ */
+}
+.input::placeholder { text-align: center; } /* ★ プレースホルダも中央 */
+.input:focus { border-color: #1a73e8; }
+
+/* ボタン */
+.btn {
+  width: 100%;
+  max-width: 360px;
+  padding: .95rem 1rem;
+  font-size: 1rem;
+  border: 0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: filter .2s, transform .02s;
+}
+.btn-primary {
+  color: #fff;
+  background: #1a73e8;
+}
+.btn:hover { filter: brightness(.95); }
+.btn:active { transform: translateY(1px); }
+.btn[disabled] { opacity: .7; cursor: not-allowed; }
+
+/* ===== ローディングオーバーレイ & スピナー ===== */
+.loading[hidden] { display: none !important; }
+.loading {
+  position: fixed; inset: 0;
+  display: grid; place-items: center;      /* 画面の幾何学中心へ */
+  padding: 24px;
+  background: rgba(255,255,255,.86);
+  z-index: 9999;
+}
+
+.spinner {
+  width: clamp(36px, 6vw, 56px);
+  height: clamp(36px, 6vw, 56px);
+  border-radius: 50%;
+  border: clamp(3px, .6vw, 5px) solid #1a73e8;
+  border-right-color: transparent;
+  animation: spin .8s linear infinite;
+  box-shadow: 0 0 0 1px rgba(0,0,0,.02) inset;
+}
+.loading-text {
+  margin-top: 12px;
+  color: #333;
+  font-weight: 600;
+  font-size: clamp(.95rem, 1.4vw, 1.05rem);
+  text-align: center;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ===== ページフェード ===== */
+body { transition: opacity .25s ease; }
+body.fade-out { opacity: 0; }
+
+/* ===== モーション配慮 ===== */
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}
+
+/* ===== スマホ微調整 ===== */
+@media (max-width: 480px) {
+  .card { padding: 1.6rem; border-radius: 12px; }
+  .title { font-size: 1.45rem; }
+  .subtitle { font-size: .95rem; }
+  .input, .btn { max-width: 100%; }
+}
