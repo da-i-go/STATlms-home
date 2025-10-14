@@ -1,5 +1,5 @@
 /* ============================================
-   🔵 problems.css（完成版・コメント付き）
+   🔵 problems.css（重なり解消・スマホ2列・コメント付き）
    ============================================ */
 
 /* ===== テーマ色（indexに合わせた青） ===== */
@@ -8,7 +8,7 @@
   --card-bg: #ffffff;
   --card-border: #e5e7eb;
   --text-muted: #5b6776;          /* ← desc の文字色（薄めグレー） */
-  --primary: #1976d2;             /* ← メインボタンの青 */
+  --primary: #1976d2;             /* ← ボタンの青 */
   --primary-shadow: rgba(25,118,210,.18);
   --success: #22c55e;             /* ← 済バッジの緑 */
 }
@@ -33,7 +33,7 @@ body {
 }
 .container.ready { opacity: 1; }
 
-/* ===== タイトル中央 ===== */
+/* ===== タイトル ===== */
 .title {
   margin: 0 0 20px;
   font-size: clamp(20px, 3.2vw, 28px); /* ← タイトルの大きさ */
@@ -50,31 +50,17 @@ body {
   align-items: stretch; /* 行内で高さをそろえる */
 }
 
-/* 📱 極小スマホでも2列を維持（カードを少し小さく） */
-@media (max-width: 380px) {
+/* 📱 スマホでも2列を維持（幅430px以下をケア） */
+@media (max-width: 430px) {
   .grid {
     grid-template-columns: repeat(2, minmax(140px, 1fr));
-    gap: 12px;
+    gap: 14px;
   }
-  .card {
-    aspect-ratio: 4 / 3; /* ← 高さを少し増やして詰まり防止 */
-    padding: 10px;
-    overflow: hidden; /* ← はみ出し防止（重なり対策） */
-  }
-  .card h3 { font-size: 13px; }
-  .card p  {
-    font-size: 12px;
-    display: -webkit-box;          /* ← 長文対策（2行まで表示） */
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-  .btn { padding: 8px 12px; font-size: .85rem; }
 }
 
 /* ===== カード ===== */
 .card {
-  aspect-ratio: 3 / 2;  /* ← 横長で全カード同じ高さ */
+  aspect-ratio: 3 / 2;              /* 既定は横長で等高 */
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
@@ -87,9 +73,18 @@ body {
   box-shadow: 0 6px 18px rgba(0,0,0,.06);
   position: relative;
   transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+  overflow: hidden;                 /* ★ はみ出しを常に防止（重なり対策の核） */
 }
 
-/* ホバー時（マウス操作時）の浮き上がり */
+/* 📱 幅430px以下は“背高”＋少しコンパクトに（重なり根絶） */
+@media (max-width: 430px) {
+  .card {
+    aspect-ratio: 4 / 3;            /* ★ 少し背高にして中身の余裕を確保 */
+    padding: 10px;
+  }
+}
+
+/* ホバー（PCマウス操作時） */
 .card:hover {
   transform: translateY(-2px);
   box-shadow: 0 10px 24px rgba(0,0,0,.08);
@@ -105,17 +100,28 @@ body {
 
 /* 🟦 症例タイトル（例：症例 3-4） */
 .card h3 {
-  font-size: clamp(14px, 2.4vw, 18px); /* ← 大きさ調整ここ */
-  color: #111;                         /* ← 色変更ここ（黒 or 青など） */
+  font-size: clamp(14px, 2.4vw, 18px); /* ← 大きさを変えるならここ */
+  color: #111;                         /* ← 色を変えるならここ（例 #0d47a1） */
   font-weight: 700;
-  min-height: 1.6em;                   /* desc が無くても高さを確保 */
+  min-height: 1.6em;                   /* タイトルだけでも高さを確保 */
 }
 
 /* 🩶 desc（短文説明） */
 .card p {
-  font-size: 14px;           /* ← 文字サイズここ */
-  color: var(--text-muted);  /* ← 色ここ（グレーを変更したい時はここ） */
-  min-height: 2.4em;         /* 高さをそろえる */
+  font-size: 14px;           /* ← 大きさを変えるならここ */
+  color: var(--text-muted);  /* ← 色を変えるならここ */
+  min-height: 2.4em;         /* 行高さを確保（等高維持に寄与） */
+}
+
+/* 📱 desc を2行でトリミング（小画面の崩れ防止） */
+@media (max-width: 430px) {
+  .card p {
+    font-size: 12px;
+    display: -webkit-box;          /* 2行で折り、超えた分を省略 */
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
 }
 
 /* ===== 「開始する」ボタン ===== */
@@ -123,14 +129,14 @@ body {
   display: inline-block;
   padding: 10px 16px;
   border-radius: 10px;
-  background: var(--primary); /* ← ボタンの色 */
+  background: var(--primary); /* ← ボタン色を変えるなら --primary */
   color: #fff;
   text-decoration: none;
   font-weight: 700;
   letter-spacing: .02em;
   transition: filter .15s ease, transform .02s ease, box-shadow .15s ease;
   box-shadow: 0 6px 14px var(--primary-shadow);
-  margin-top: auto; /* ← ボタンをカード下に固定 */
+  margin-top: auto; /* ★ ボタンをカード下に固定 */
 }
 .btn:hover  { filter: brightness(.96); }
 .btn:active { transform: scale(.98); }
@@ -177,7 +183,7 @@ body {
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* ===== アニメやトランジションの軽減設定 ===== */
+/* ===== 動きの軽減設定 ===== */
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; animation: none !important; }
 }
