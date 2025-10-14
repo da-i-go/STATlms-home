@@ -1,23 +1,28 @@
-/* テーマ色（indexに合わせた青） */
+/* ============================================
+   🔵 problems.css（完成版・コメント付き）
+   ============================================ */
+
+/* ===== テーマ色（indexに合わせた青） ===== */
 :root {
   --bg: #f7f9fc;
   --card-bg: #ffffff;
   --card-border: #e5e7eb;
-  --text-muted: #5b6776;
-  --primary: #1976d2;
+  --text-muted: #5b6776;          /* ← desc の文字色（薄めグレー） */
+  --primary: #1976d2;             /* ← メインボタンの青 */
   --primary-shadow: rgba(25,118,210,.18);
-  --success: #22c55e;
+  --success: #22c55e;             /* ← 済バッジの緑 */
 }
 
-/* 背景*/
+/* ===== 背景・全体設定 ===== */
 body {
   margin: 0;
   background: var(--bg);
-  color: #111;
-  font-family: system-ui, -apple-system, "Helvetica Neue", Arial, "Segoe UI", Roboto, "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
+  color: #111; /* ← 全体の基本文字色 */
+  font-family: system-ui, -apple-system, "Helvetica Neue", Arial, "Segoe UI", Roboto,
+               "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
 }
 
-/* コンテナ中央寄せ＋フェードイン */
+/* ===== コンテナ中央寄せ＋フェードイン ===== */
 .container {
   max-width: 920px;
   margin: 6vh auto 10vh;
@@ -28,32 +33,51 @@ body {
 }
 .container.ready { opacity: 1; }
 
-/* タイトル中央 */
+/* ===== タイトル中央 ===== */
 .title {
   margin: 0 0 20px;
-  font-size: clamp(20px, 3.2vw, 28px);
+  font-size: clamp(20px, 3.2vw, 28px); /* ← タイトルの大きさ */
   font-weight: 1000;
 }
 
-/* 2列グリッド（常時2列／極小でも2列を維持） */
+/* ===== グリッド（2列レイアウト） ===== */
 .grid {
   margin: 0 auto;
   display: grid;
-  gap: 16px;
+  gap: 16px; /* ← カード間の隙間 */
   grid-template-columns: repeat(2, minmax(220px, 1fr));
   max-width: 720px;
   align-items: stretch; /* 行内で高さをそろえる */
 }
+
+/* 📱 極小スマホでも2列を維持（カードを少し小さく） */
 @media (max-width: 380px) {
-  .grid { grid-template-columns: repeat(2, minmax(140px, 1fr)); } /* ← 2列を維持 */
+  .grid {
+    grid-template-columns: repeat(2, minmax(140px, 1fr));
+    gap: 12px;
+  }
+  .card {
+    aspect-ratio: 4 / 3; /* ← 高さを少し増やして詰まり防止 */
+    padding: 10px;
+    overflow: hidden; /* ← はみ出し防止（重なり対策） */
+  }
+  .card h3 { font-size: 13px; }
+  .card p  {
+    font-size: 12px;
+    display: -webkit-box;          /* ← 長文対策（2行まで表示） */
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .btn { padding: 8px 12px; font-size: .85rem; }
 }
 
-/* カード：横長(3:2)・中央配置・軽い影 */
+/* ===== カード ===== */
 .card {
-  aspect-ratio: 3 / 2;               /* 等高を aspect-ratio で統一 */
+  aspect-ratio: 3 / 2;  /* ← 横長で全カード同じ高さ */
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;       /* 中身は上から */
+  justify-content: flex-start;
   align-items: center;
   gap: 14px;
   padding: 14px;
@@ -64,60 +88,75 @@ body {
   position: relative;
   transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
 }
+
+/* ホバー時（マウス操作時）の浮き上がり */
 .card:hover {
   transform: translateY(-2px);
   box-shadow: 0 10px 24px rgba(0,0,0,.08);
   border-color: #dbe2ea;
 }
 
-/* 見出し・補足（中央） */
+/* ===== カード内テキスト ===== */
 .card h3,
 .card p {
   margin: 0;
   text-align: center;
 }
-.card h3 { font-size: clamp(14px, 2.4vw, 18px); }
-/* desc の有無で高さがブレないように少しだけ高さを確保 */
-.card h3 { min-height: 1.6em; }
-.card p  { font-size: 14px; color: var(--text-muted); min-height: 2.4em; }
 
-/* 「開始する」ボタン（下寄せ固定・index寄りの色味） */
+/* 🟦 症例タイトル（例：症例 3-4） */
+.card h3 {
+  font-size: clamp(14px, 2.4vw, 18px); /* ← 大きさ調整ここ */
+  color: #111;                         /* ← 色変更ここ（黒 or 青など） */
+  font-weight: 700;
+  min-height: 1.6em;                   /* desc が無くても高さを確保 */
+}
+
+/* 🩶 desc（短文説明） */
+.card p {
+  font-size: 14px;           /* ← 文字サイズここ */
+  color: var(--text-muted);  /* ← 色ここ（グレーを変更したい時はここ） */
+  min-height: 2.4em;         /* 高さをそろえる */
+}
+
+/* ===== 「開始する」ボタン ===== */
 .btn {
   display: inline-block;
   padding: 10px 16px;
   border-radius: 10px;
-  background: var(--primary);
+  background: var(--primary); /* ← ボタンの色 */
   color: #fff;
   text-decoration: none;
   font-weight: 700;
   letter-spacing: .02em;
   transition: filter .15s ease, transform .02s ease, box-shadow .15s ease;
   box-shadow: 0 6px 14px var(--primary-shadow);
-  margin-top: auto; /* ← これでボタンが最下部に張り付く */
+  margin-top: auto; /* ← ボタンをカード下に固定 */
 }
 .btn:hover  { filter: brightness(.96); }
 .btn:active { transform: scale(.98); }
 
-/* キーボード操作の見やすいフォーカス */
+/* キーボード操作時のフォーカス */
 .btn:focus-visible {
   outline: 3px solid color-mix(in srgb, var(--primary) 35%, transparent);
   outline-offset: 2px;
 }
 
-/* 済バッジ（右上） */
+/* ===== 済バッジ（右上） ===== */
 .badge {
   position: absolute;
   top: 10px; right: 10px;
-  background: var(--success); color: #fff;
+  background: var(--success);
+  color: #fff;
   border-radius: 999px;
   padding: 4px 8px;
-  font-weight: 700; font-size: 12px;
+  font-weight: 700;
+  font-size: 12px;
 }
 
-/* ログアウトの余白（任意：HTMLで .footer-actions を付けると効く） */
+/* ===== ログアウトなどのフッター余白 ===== */
 .footer-actions { margin-top: 24px; }
 
-/* --- 読み込みオーバーレイ（index と統一感） --- */
+/* ===== 読み込みオーバーレイ ===== */
 .loading[hidden] { display: none; }
 .loading {
   position: fixed; inset: 0;
@@ -138,7 +177,7 @@ body {
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* アニメやトランジションが苦手な人向け配慮 */
+/* ===== アニメやトランジションの軽減設定 ===== */
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; animation: none !important; }
 }
