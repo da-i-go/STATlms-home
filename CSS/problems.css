@@ -1,8 +1,4 @@
-/* ============================================
-   🔵 problems.css（重なり解消・スマホ2列・コメント付き）
-   ============================================ */
-
-/* ===== テーマ色（indexに合わせた青） ===== */
+/* ===== テーマカラー（indexに合わせた青） ===== */
 :root {
   --bg: #f7f9fc;
   --card-bg: #ffffff;
@@ -13,7 +9,7 @@
   --success: #22c55e;             /* ← 済バッジの緑 */
 }
 
-/* ===== 背景・全体設定 ===== */
+/* ===== 全体の背景と基本設定 ===== */
 body {
   margin: 0;
   background: var(--bg);
@@ -22,7 +18,7 @@ body {
                "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
 }
 
-/* ===== コンテナ中央寄せ＋フェードイン ===== */
+/* ===== メインコンテナ（中央寄せ＋フェードイン） ===== */
 .container {
   max-width: 920px;
   margin: 6vh auto 10vh;
@@ -33,7 +29,7 @@ body {
 }
 .container.ready { opacity: 1; }
 
-/* ===== タイトル ===== */
+/* ===== タイトル（「問題一覧」など） ===== */
 .title {
   margin: 0 0 20px;
   font-size: clamp(20px, 3.2vw, 28px); /* ← タイトルの大きさ */
@@ -55,10 +51,11 @@ body {
   .grid {
     grid-template-columns: repeat(2, minmax(140px, 1fr));
     gap: 14px;
+    grid-auto-rows: minmax(180px, auto); /* ← 各行の最低高さを確保 */
   }
 }
 
-/* ===== カード ===== */
+/* ===== カード全体 ===== */
 .card {
   aspect-ratio: 3 / 2;              /* 既定は横長で等高 */
   display: flex;
@@ -73,25 +70,26 @@ body {
   box-shadow: 0 6px 18px rgba(0,0,0,.06);
   position: relative;
   transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
-  overflow: hidden;                 /* ★ はみ出しを常に防止（重なり対策の核） */
 }
 
-/* 📱 幅430px以下は“背高”＋少しコンパクトに（重なり根絶） */
+/* 📱 幅430px以下では高さ自動化＆コンパクト化 */
 @media (max-width: 430px) {
   .card {
-    aspect-ratio: 4 / 3;            /* ★ 少し背高にして中身の余裕を確保 */
-    padding: 10px;
+    aspect-ratio: auto;        /* ← 固定比率を解除して内容に合わせる */
+    min-height: 180px;         /* ← 下限を確保（170〜200で調整可） */
+    padding: 12px 12px 14px;
+    overflow: visible;         /* ← はみ出し防止（ボタン欠けを防ぐ） */
   }
 }
 
-/* ホバー（PCマウス操作時） */
+/* ===== ホバー効果（PC用） ===== */
 .card:hover {
   transform: translateY(-2px);
   box-shadow: 0 10px 24px rgba(0,0,0,.08);
   border-color: #dbe2ea;
 }
 
-/* ===== カード内テキスト ===== */
+/* ===== カード内のテキスト ===== */
 .card h3,
 .card p {
   margin: 0;
@@ -100,24 +98,24 @@ body {
 
 /* 🟦 症例タイトル（例：症例 3-4） */
 .card h3 {
-  font-size: clamp(14px, 2.4vw, 18px); /* ← 大きさを変えるならここ */
-  color: #111;                         /* ← 色を変えるならここ（例 #0d47a1） */
+  font-size: clamp(14px, 2.4vw, 18px); /* ← 文字サイズ変更はここ */
+  color: #111;                         /* ← 色変更はここ（例: #0d47a1） */
   font-weight: 700;
-  min-height: 1.6em;                   /* タイトルだけでも高さを確保 */
+  min-height: 1.6em;                   /* タイトルのみでも高さ確保 */
 }
 
 /* 🩶 desc（短文説明） */
 .card p {
-  font-size: 14px;           /* ← 大きさを変えるならここ */
-  color: var(--text-muted);  /* ← 色を変えるならここ */
-  min-height: 2.4em;         /* 行高さを確保（等高維持に寄与） */
+  font-size: 14px;           /* ← 説明文の文字サイズ */
+  color: var(--text-muted);  /* ← 説明文の色（グレー） */
+  min-height: 2.4em;         /* 等高維持に寄与 */
 }
 
-/* 📱 desc を2行でトリミング（小画面の崩れ防止） */
+/* 📱 descを2行で省略（小画面の崩れ防止） */
 @media (max-width: 430px) {
   .card p {
     font-size: 12px;
-    display: -webkit-box;          /* 2行で折り、超えた分を省略 */
+    display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
@@ -129,19 +127,28 @@ body {
   display: inline-block;
   padding: 10px 16px;
   border-radius: 10px;
-  background: var(--primary); /* ← ボタン色を変えるなら --primary */
+  background: var(--primary); /* ← ボタン色を変えるならここ */
   color: #fff;
   text-decoration: none;
   font-weight: 700;
   letter-spacing: .02em;
   transition: filter .15s ease, transform .02s ease, box-shadow .15s ease;
   box-shadow: 0 6px 14px var(--primary-shadow);
-  margin-top: auto; /* ★ ボタンをカード下に固定 */
+  margin-top: auto; /* ← カード下に固定 */
 }
+
+/* 📱 スマホボタンはやや小さく */
+@media (max-width: 430px) {
+  .btn {
+    padding: 9px 12px;
+    font-size: .9rem;
+  }
+}
+
 .btn:hover  { filter: brightness(.96); }
 .btn:active { transform: scale(.98); }
 
-/* キーボード操作時のフォーカス */
+/* ===== キーボード操作時のフォーカス ===== */
 .btn:focus-visible {
   outline: 3px solid color-mix(in srgb, var(--primary) 35%, transparent);
   outline-offset: 2px;
@@ -183,41 +190,7 @@ body {
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* ===== 動きの軽減設定 ===== */
+/* ===== アニメやトランジションの軽減設定 ===== */
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; animation: none !important; }
-}
-
-/* ==== モバイルの高さ調整＆等高化（上書き） ==== */
-@media (max-width: 420px) {
-  /* 2列は維持しつつ、各行の最低高さを統一 */
-  .grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 14px;
-    grid-auto-rows: minmax(180px, auto); /* ← 行の“最低高さ”を180pxに */
-  }
-
-  .card {
-    aspect-ratio: auto;        /* ← 固定比率をやめて内容に合わせて伸びる */
-    min-height: 180px;         /* ← 下限を確保（端末により 170〜200 で調整可） */
-    padding: 12px 12px 14px;   /* ← 余白少し詰める */
-    overflow: visible;         /* ← はみ出しを隠さない（ボタン欠け防止） */
-  }
-
-  /* タイトル＆説明の詰まりを軽減 */
-  .card h3 { font-size: 13px; line-height: 1.25; }
-  .card p  { font-size: 12px; line-height: 1.4; min-height: 1.8em; }
-
-  /* ボタンは下に寄せ、サイズは控えめに */
-  .btn {
-    margin-top: auto;          /* ← 下寄せ（既に指定済みでもOK） */
-    padding: 9px 12px;
-    font-size: .9rem;
-  }
-}
-
-/* さらに狭い端末向け（任意） */
-@media (max-width: 360px) {
-  .grid { grid-auto-rows: minmax(190px, auto); }
-  .card { min-height: 190px; }
 }
