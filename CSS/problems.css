@@ -98,7 +98,7 @@ body {
 
 /* 🟦 症例タイトル（例：症例 3-4） */
 .card h3 {
-  font-size: clamp(14px, 2.4vw, 18px); /* ← 文字サイズ変更はここ */
+  font-size: clamp(14px, 2.4vw, 30px); /* ← 文字サイズ変更はここ */
   color: #111;                         /* ← 色変更はここ（例: #0d47a1） */
   font-weight: 700;
   min-height: 1.6em;                   /* タイトルのみでも高さ確保 */
