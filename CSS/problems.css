@@ -1,29 +1,228 @@
-/* ==== スマホの縦スカスカ解消（最終パッチ） ==== */
+/* ============================================
+   🔵 problems.css（スマホ最終安定版・縦空白解消＋コメント付き）
+   ============================================ */
+
+/* ===== テーマカラー（indexに合わせた青） ===== */
+:root {
+  --bg: #f7f9fc;
+  --card-bg: #ffffff;
+  --card-border: #e5e7eb;
+  --text-muted: #5b6776;
+  --primary: #1976d2;
+  --primary-shadow: rgba(25,118,210,.18);
+  --success: #22c55e;
+}
+
+/* ===== 全体の背景と文字設定 ===== */
+body {
+  margin: 0;
+  background: var(--bg);
+  color: #111;
+  font-family: system-ui, -apple-system, "Helvetica Neue", Arial, "Segoe UI", Roboto,
+               "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
+}
+
+/* ===== コンテナ中央寄せ＋フェードイン ===== */
+.container {
+  max-width: 920px;
+  margin: 6vh auto 10vh;
+  padding: 0 16px;
+  text-align: center;
+  opacity: 0;
+  transition: opacity .25s ease;
+}
+.container.ready { opacity: 1; }
+
+/* ===== タイトル ===== */
+.title {
+  margin: 0 0 20px;
+  font-size: clamp(20px, 3.2vw, 28px);
+  font-weight: 1000;
+}
+
+/* ===== グリッド（2列レイアウト） ===== */
+.grid {
+  margin: 0 auto;
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(2, minmax(220px, 1fr));
+  max-width: 720px;
+  align-items: stretch;
+}
+
+/* 📱 スマホでも2列を維持 */
 @media (max-width: 430px) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(140px, 1fr));
+    gap: 14px;
+    grid-auto-rows: minmax(180px, auto);
+  }
+}
+
+/* ===== カード全体 ===== */
+.card {
+  aspect-ratio: 3 / 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 14px;
+  padding: 14px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 14px;
+  box-shadow: 0 6px 18px rgba(0,0,0,.06);
+  position: relative;
+  transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+}
+
+/* 📱 スマホ：高さ自動化＆余白軽減 */
+@media (max-width: 430px) {
+  .card {
+    aspect-ratio: auto;
+    min-height: 180px;
+    padding: 12px 12px 14px;
+    overflow: visible;
+  }
+}
+
+/* ===== ホバー効果 ===== */
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(0,0,0,.08);
+  border-color: #dbe2ea;
+}
+
+/* ===== カード内テキスト ===== */
+.card h3,
+.card p {
+  margin: 0;
+  text-align: center;
+}
+
+.card h3 {
+  font-size: clamp(14px, 2.4vw, 25px);
+  color: #111;
+  font-weight: 700;
+  min-height: 1.6em;
+}
+
+.card p {
+  font-size: 14px;
+  color: var(--text-muted);
+  min-height: 2.4em;
+}
+
+/* 📱 desc省略（2行まで） */
+@media (max-width: 430px) {
+  .card p {
+    font-size: 12px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}
+
+/* ===== 「開始する」ボタン ===== */
+.btn {
+  display: inline-block;
+  padding: 10px 16px;
+  border-radius: 10px;
+  background: var(--primary);
+  color: #fff;
+  text-decoration: none;
+  font-weight: 700;
+  letter-spacing: .02em;
+  transition: filter .15s ease, transform .02s ease, box-shadow .15s ease;
+  box-shadow: 0 6px 14px var(--primary-shadow);
+  margin-top: auto; /* PCでは下寄せ */
+}
+.btn:hover  { filter: brightness(.96); }
+.btn:active { transform: scale(.98); }
+
+/* 📱 スマホボタン調整 */
+@media (max-width: 430px) {
+  .btn {
+    padding: 9px 12px;
+    font-size: .9rem;
+  }
+}
+
+/* ===== キーボード操作フォーカス ===== */
+.btn:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--primary) 35%, transparent);
+  outline-offset: 2px;
+}
+
+/* ===== 済バッジ ===== */
+.badge {
+  position: absolute;
+  top: 10px; right: 10px;
+  background: var(--success);
+  color: #fff;
+  border-radius: 999px;
+  padding: 4px 8px;
+  font-weight: 700;
+  font-size: 12px;
+}
+
+/* ===== フッター余白 ===== */
+.footer-actions { margin-top: 24px; }
+
+/* ===== 読み込みオーバーレイ ===== */
+.loading[hidden] { display: none; }
+.loading {
+  position: fixed; inset: 0;
+  background: rgba(255,255,255,.85);
+  display: grid; place-items: center;
+  z-index: 9999;
+}
+.spinner {
+  width: 44px; height: 44px; border-radius: 50%;
+  border: 3px solid var(--primary);
+  border-right-color: transparent;
+  animation: spin .8s linear infinite;
+}
+.loading-text {
+  margin-top: 12px;
+  color: #111;
+  font-weight: 600;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ===== アニメーション軽減 ===== */
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}
+
+/* ==== 📱 最終上書き：縦スカスカ解消 ==== */
+@media (max-width: 480px) {
   .grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 10px;
-    grid-auto-rows: auto;               /* ← 各行の高さは内容に応じて伸縮 */
+    grid-auto-rows: auto;
   }
 
   .card {
-    aspect-ratio: auto !important;      /* ← 固定比率は解除 */
-    min-height: auto !important;        /* ← 下限を外し“自動高さ”に */
-    padding: 10px 10px 12px !important; /* ← 余白を少し詰める */
-    gap: 10px;                           /* ← 内部の行間も少し圧縮 */
+    aspect-ratio: auto !important;
+    min-height: auto !important;
+    padding: 10px 10px 12px !important;
+    gap: 10px;
   }
 
-  /* 見出しと説明をコンパクトに */
   .card h3 { font-size: 13px; line-height: 1.25; margin: 0; }
   .card p  { font-size: 12px; line-height: 1.35; margin: 0; }
 
-  /* ボタンは“下固定”ではなく通常フローで直下に配置 */
   .btn {
-    margin-top: 0 !important;           /* ← これで真ん中の空白が消える */
+    margin-top: 0 !important; /* ← 下固定を解除して中央の空白を削除 */
+    margin-bottom: 6px;
     padding: 8px 12px;
     font-size: .9rem;
   }
 
-  /* タイトル行の上下余白も少し詰める */
-  .container { margin-top: 3vh; margin-bottom: 5vh; }
+  .container {
+    margin-top: 3vh;
+    margin-bottom: 5vh;
+  }
 }
