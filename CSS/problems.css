@@ -44,7 +44,16 @@ body {
   max-width: 720px;
 }
 @media (max-width: 380px) {
-  .grid { grid-template-columns: 1fr; }
+  .grid {
+    grid-template-columns: repeat(2, minmax(140px, 1fr)); /* ← 2列に変更 */
+    gap: 12px; /* 隙間を少し狭く */
+  }
+  .card {
+    padding: 10px;
+    gap: 8px;
+  }
+  .card h3 { font-size: 13px; }
+  .btn { padding: 8px 12px; font-size: 0.85rem; }
 }
 
 /* カード：横長(3:2)・中央配置・軽い影 */
