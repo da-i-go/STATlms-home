@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="CSS/problems.css" />
 
     <script>
+      // 未認証ならログインへ
       if (sessionStorage.getItem("authenticated") !== "true") {
         location.replace("index.html");
       }
@@ -21,76 +22,114 @@
 
       <div class="grid" id="problems"></div>
 
-      <div style="text-align: center; margin-top: 16px;">
+      <div style="text-align:center; margin-top:16px;">
         <a href="index.html" class="btn" onclick="sessionStorage.clear()">ログアウト</a>
       </div>
     </main>
-    
-    <!-- 読み込み中オーバーレイ -->
+
+    <!-- 読み込み中オーバーレイ（初期表示で見せる想定） -->
     <div id="loading" class="loading" aria-live="polite" aria-busy="true">
-        <div class="spinner" aria-hidden="true"></div>
-        <p class="loading-text">読み込み中です…</p>
+      <div class="spinner" aria-hidden="true"></div>
+      <p class="loading-text">読み込み中です…</p>
     </div>
 
-   <script>
-  const API = "https://script.google.com/macros/s/AKfycbx8b_17MyBUxJtJhJ21KFSfJguUBSGKHBg-WjLHHylbqho1pFjZKIMjvqlMWzUWNFcC/exec";
-  const uid = sessionStorage.getItem("uid");
+    <script>
+      // ====== 設定 ======
+      const API = "https://script.google.com/macros/s/AKfycbx8b_17MyBUxJtJhJ21KFSfJguUBSGKHBg-WjLHHylbqho1pFjZKIMjvqlMWzUWNFcC/exec";
+      const uid = sessionStorage.getItem("uid") || "";
 
-  const root = document.getElementById("problems");
-  const container = document.querySelector("main.container");
-  const loader = document.getElementById("loading");
+      // 症例リスト（必要に応じて追加/編集）
+      const list = [
+        { id: "3-1", title: "症例 3-1", href: "https://da-i-go.github.io/STATlms-3-1/" },
+        { id: "3-2", title: "症例 3-2", href: "https://da-i-go.github.io/STATlms-3-2/" },
+        { id: "3-3", title: "症例 3-3", href: "https://da-i-go.github.io/STATlms-3-3/" },
+        { id: "3-4", title: "症例 3-4", desc: "当院症例", href: "https://da-i-go.github.io/STATlms-3-4-catheter/" }
+      ];
 
-  const list = [
-    { id: "3-1", title: "症例 3-1", href: "https://da-i-go.github.io/STATlms-3-1/" },
-    { id: "3-2", title: "症例 3-2", href: "https://da-i-go.github.io/STATlms-3-2/" },
-    { id: "3-3", title: "症例 3-3", href: "https://da-i-go.github.io/STATlms-3-3/" },
-    { id: "3-4", title: "症例 3-4",desc: "当院症例", href: "https://da-i-go.github.io/STATlms-3-4-catheter/" }
-  ];
+      // ====== 要素取得 ======
+      const root = document.getElementById("problems");
+      const container = document.querySelector("main.container");
+      const loader = document.getElementById("loading");
 
-  (async () => {
-    loader.hidden = false;             // ← まずローディング表示
-    const start = performance.now();   // ← 最低表示時間を確保したい時用
-
-    let done = {};
-    try {
-      const r = await fetch(API + "?route=status", {
-        method: "POST",
-        headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify({ uid })
-      });
-      const j = await r.json();
-      if (j.ok) done = j.done || {};
-    } catch (e) {
-      console.warn(e);
-    }
-
-    // カード描画（既存どおり）
-    list.forEach((p) => {
-      const card = document.createElement("div");
-      card.className = "card";
-      if (done[p.id]) {
-        const b = document.createElement("div");
-        b.className = "badge";
-        b.textContent = "済";
-        card.appendChild(b);
+      // ====== APIから進捗取得 ======
+      async function fetchStatus() {
+        try {
+          const r = await fetch(API + "?route=status", {
+            method: "POST",
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify({ uid })
+          });
+          const j = await r.json();
+          return (j.ok && j.done) ? j.done : {};
+        } catch (e) {
+          console.warn("[status] fetch failed:", e);
+          return {};
+        }
       }
-      card.innerHTML += `
-        <h3>${p.title}</h3>
-        <p>${p.desc || ""}</p>
-        <a class="btn" href="${p.href}">開始する</a>
-      `;
-      root.appendChild(card);
-    });
 
-    // 最低 300ms はローディングを見せてからフェードイン（好みで数値調整）
-    const elapsed = performance.now() - start;
-    const remain = Math.max(0, 300 - elapsed);
-    setTimeout(() => {
-      loader.hidden = true;
-      container.classList.add("ready");  // ← フェードイン
-    }, remain);
-  })();
-</script>
+      // ====== カード描画 ======
+      function renderCards(doneMap) {
+        root.innerHTML = ""; // 再描画時は毎回クリア
+        list.forEach((p) => {
+          const card = document.createElement("div");
+          card.className = "card";
 
+          if (doneMap[p.id]) {
+            const b = document.createElement("div");
+            b.className = "badge";
+            b.textContent = "済";
+            card.appendChild(b);
+          }
+
+          card.innerHTML += `
+            <h3>${p.title}</h3>
+            <p>${p.desc || ""}</p>
+            <a class="btn" href="${p.href}">開始する</a>
+          `;
+
+          root.appendChild(card);
+        });
+      }
+
+      // ====== 進捗の再取得＆描画（最小表示時間つき） ======
+      let refreshTimer = 0;
+      async function refresh(minimumMs = 300) {
+        loader.hidden = false;
+        const start = performance.now();
+
+        const done = await fetchStatus();
+        renderCards(done);
+
+        const elapsed = performance.now() - start;
+        const remain = Math.max(0, minimumMs - elapsed);
+        setTimeout(() => {
+          loader.hidden = true;
+          container.classList.add("ready"); // フェードイン等のトリガ
+        }, remain);
+      }
+
+      // ====== 初回描画 ======
+      refresh();
+
+      // ====== 戻る/復帰時の自動リフレッシュ ======
+      // BFCacheでの復元時（history back 直後でも発火）
+      window.addEventListener("pageshow", (e) => {
+        if (e.persisted) refresh(150);
+      });
+
+      // タブが非表示→表示に戻った時
+      document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "visible") {
+          clearTimeout(refreshTimer);
+          refreshTimer = setTimeout(() => refresh(150), 120);
+        }
+      });
+
+      // ウィンドウにフォーカスが戻った時
+      window.addEventListener("focus", () => {
+        clearTimeout(refreshTimer);
+        refreshTimer = setTimeout(() => refresh(150), 120);
+      });
+    </script>
   </body>
 </html>
